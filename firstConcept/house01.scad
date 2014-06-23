@@ -1,14 +1,8 @@
-include <configuration.scad>;
-// include <original_structure/window_door_dimensions.scad>;
-// include <original_structure/stair_dimensions.scad>;
-// include <original_structure/first_floor_interior_dimensions.scad>;
-// include <original_structure/second_floor_interior_dimensions.scad>;
-// include <original_structure/interior.scad>;
-// include <original_structure/exterior.scad>;
-
+include <configuration01.scad>;
 
 exterior();
 interior();
+addition();
 
 
 /////////////////////////////////////////////////////////////
@@ -51,17 +45,305 @@ module exterior() {
 }
 
 module exterior_walls() {
-  south_wall();                             // Turn on or off here (south wall)
+  south_wall(1);                             // Turn on or off here (south wall)
+  south_wall(2);
   translate([0, (house_length - ext_wall_thickness), 0]) {
-    north_wall();                           // Turn on or off here (North wall)
+    north_wall(1);                           // Turn on or off here (North wall)
+    north_wall(2);
   }
   rotate(90) {
-    west_wall();                            // Turn on or off here (West Wall)
+    west_wall(1);                            // Turn on or off here (West Wall)
+    west_wall(2);
     translate([0, -house_width, 0]) {
-      east_wall();                          // Turn on or off here (East Wall)
+      east_wall(1);                          // Turn on or off here (East Wall)
+      east_wall(2);
     }
   }
 }
+
+// It would be nice to use this but it requires reworking all the translations etc in the wall sections
+module first_floor() {
+  east_wall(1);
+  south_wall(1);
+  west_wall(1);
+  north_wall(1);
+}
+
+// It would be nice to use this but it requires reworking all the translations etc in the wall sections
+module second_floor() {
+  east_wall(2);
+  south_wall(2);
+  west_wall(2);
+  north_wall(2);
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > addition
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > addition
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+required_backset          = feet(8);
+addition_width            = feet(40);
+addition_length           = feet(30);
+addition_location         = [(house_width), (required_backset),  0];
+
+add_floor_dimensions      = [addition_width, addition_length, floor_thickness];
+add_floor_location        = [0, 0, story_height];
+
+//###########################################################
+//###########################################################
+module addition() {
+  translate(addition_location) {
+    add_first_floor();
+    add_second_floor();
+  }
+}
+
+module add_first_floor() {
+  add_south_wall(1);
+  add_east_wall(1);
+  add_north_wall(1);
+  add_west_wall(1);
+}
+
+module add_second_floor() {
+  add_south_wall(2);
+  add_east_wall(2);
+  add_north_wall(2);
+  add_west_wall(2); 
+  %add_floor();
+}
+
+module add_floor() {
+  rotate([0,0,0]) {
+    translate(add_floor_location) {
+      cube(add_floor_dimensions);
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > addition > South Wall
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > addition > South Wall
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+
+add_south_wall_width                = addition_width;
+add_south_wall_dimensions           = [add_south_wall_width, ext_wall_thickness, story_height];
+add_south_wall_location             = [0, 0, 0];
+
+//###########################################################
+//###########################################################
+
+module add_south_wall(story) {
+  rotate([0, 0, 0]) {
+    translate(add_south_wall_location) {
+      cube([add_south_wall_dimensions[0], add_south_wall_dimensions[1], add_south_wall_dimensions[2] * story]);
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > addition > East Wall
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > addition > East Wall
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+
+add_east_wall_width                = addition_length;
+add_east_wall_dimensions           = [add_east_wall_width, ext_wall_thickness, story_height];
+add_east_wall_location             = [0, -addition_width, 0];
+
+//###########################################################
+//###########################################################
+
+module add_east_wall(story) {
+  rotate([0, 0, 90]) {
+    translate(add_east_wall_location) {
+      cube([add_east_wall_dimensions[0], add_east_wall_dimensions[1], add_east_wall_dimensions[2] * story]);
+    }
+  } 
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > addition > North Wall
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > addition > North Wall
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+
+add_north_wall_width                = addition_width;
+add_north_wall_dimensions           = [add_north_wall_width, ext_wall_thickness, story_height];
+add_north_wall_location             = [0, addition_length, 0];
+
+//###########################################################
+//###########################################################
+
+module add_north_wall(story) {
+  rotate([0, 0, 0]) {
+    translate(add_north_wall_location) {
+      cube([add_north_wall_dimensions[0], add_north_wall_dimensions[1], add_north_wall_dimensions[2] * story]);
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > addition > West Wall
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > addition > West Wall
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+
+add_west_wall_width                = addition_length;
+add_west_wall_dimensions           = [add_west_wall_width, ext_wall_thickness, story_height];
+add_west_wall_location             = [0, 0, 0];
+
+passage_upper_width                = feet(12);
+passage_upper_dimensions           = [passage_upper_width, story_height];
+passage_upper_location             = [feet(4), -.5, story_height];
+
+passage_lower_width                = feet(8);
+passage_lower_dimensions          = [passage_lower_width, story_height];
+passage_lower_location             = [feet(3), -.5, 0];
+
+//###########################################################
+//###########################################################
+
+
+  // the old house exterior is the same as this wall.
+  // it may be easier to cut a hole the size of the addition
+  // in the old house and use this wall to manage the passages
+  // between sections.
+
+module add_west_wall(story) {
+  rotate([0, 0, 90]) {
+    translate(add_west_wall_location) {
+      difference() {
+        cube([add_west_wall_dimensions[0], add_west_wall_dimensions[1], add_west_wall_dimensions[2] * story]);
+        ext_pierceing(passage_upper_dimensions, passage_upper_location);
+        ext_pierceing(passage_lower_dimensions, passage_lower_location);
+      }
+    }
+  } 
+}
+
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 //
@@ -126,24 +408,34 @@ window14_height           = up_dbl_hung_height;
 window14_location         = [(south_wall_to_bay + bay_window_width + feet(3)), 0, feet(4)];
 window14_dimensions       = [window14_width, window14_height];
 
+// Addition opening.
+// get rid of the whole wall between old and addition. Use the west wall of addition
+// to manage openings
+add_opening_width       = addition_length;
+add_opening_dimensions  = [add_opening_width, story_height * 2];
+add_opening_location    = [addition_location[1], -.5, addition_location[2]];
+
 //###########################################################
 //###########################################################
 
-module east_wall() {
+module east_wall(story) {
   difference() {
-    cube([house_length, ext_wall_thickness, house_height]);
+    cube([house_length, ext_wall_thickness, story_height * story]);
     translate([0, -.5, 0]) { // shift a tiny bit so piercings look nice
       ext_pierceing(window05_dimensions, window05_location);
       ext_pierceing(window06_dimensions, window06_location);
       ext_pierceing(window07_dimensions, window07_location);
       ext_pierceing(window08_dimensions, window08_location);
       ext_pierceing(window14_dimensions, window14_location);
-      ext_pierceing( [bay_window_width - ext_wall_thickness, bay_window_height], [south_wall_to_bay, 0, 0] );
       ext_pierceing(window18_dimensions, window18_location);
+      // This is the hole for the bay window area
+      *ext_pierceing( [bay_window_width - ext_wall_thickness, bay_window_height], [south_wall_to_bay, 0, 0] );
+      // This is the hole for the addition
+      ext_pierceing(add_opening_dimensions, add_opening_location);
     }
   }
   translate([south_wall_to_bay, -bay_window_depth, 0]) {
-    bay_window_area();                                      // Turn on or off here (bay window)
+    *bay_window_area();                                      // Turn on or off here (bay window)
   }
   translate([house_length - sheds_width, -sheds_depth, 0]) {
     sheds_area();                                           // Turn on or off here (Sheds)
@@ -217,9 +509,9 @@ window18_location         = [feet(26), 0, story_height + feet(4)];
 //###########################################################
 //###########################################################
 
-module west_wall() {
+module west_wall(story) {
   difference() {
-    cube([house_length, ext_wall_thickness, house_height]);
+    cube([house_length, ext_wall_thickness, story_height * story]);
     translate([0, -.5, 0]) { // shift a tiny bit so piercings look nice
       ext_pierceing(window09_dimensions, window09_location);
       ext_pierceing(window10_dimensions, window10_location);
@@ -290,9 +582,9 @@ west_wall_to_pantry_door  = door02_location[0];
 //###########################################################
 //###########################################################
 
-module north_wall() {
+module north_wall(story) {
   difference() {
-    cube([house_width, ext_wall_thickness, house_height]);
+    cube([house_width, ext_wall_thickness, story_height * story]);
     translate([0, -.5, 0]) { // shift a tiny bit so piercings look nice
       ext_pierceing(window11_dimensions, window11_location);
       ext_pierceing(window12_dimensions, window12_location);
@@ -366,9 +658,9 @@ window03_dimensions       = [up_south_width, up_south_height];
 //###########################################################
 //###########################################################
 
-module south_wall() {
+module south_wall(story) {
   difference() {
-    cube([house_width, ext_wall_thickness, house_height]);
+    cube([house_width, ext_wall_thickness, story_height * story]);
     translate([0, -.5, 0]) { // shift a tiny bit so piercings look nice
       ext_pierceing(window01_dimensions, window01_location);
       ext_pierceing(window02_dimensions, window02_location);
@@ -445,7 +737,7 @@ module pantry() {
 ///////////////////
 // Measured dimensions
 // Put measured dimensions up top here to make them easy to find. 
-// Name them well, and then replace the arbitrary or caclculated
+// Name them well, and then replace the arbitrary or calculated
 // dimension below. The model is measured from the SW corner of the house.
 // That is the left corner if you are between the house and the water looking 
 // at the house.
@@ -881,7 +1173,7 @@ module counters() {
 module second_floor() {
  north_br_south_wall();
  north_br_shared_wall();
- master_closet();
+ *master_closet();
  master_bath();
  hallway();
  master_bedroom();
