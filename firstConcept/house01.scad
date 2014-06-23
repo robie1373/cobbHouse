@@ -40,8 +40,15 @@ addition();
 //###########################################################
 
 module exterior() {
-  color("Moccasin") { exterior_walls(); }   // Turn on or off here (all exterior walls)
-  tree();                                   // Turn on or off here (the tree)
+  // color("Moccasin") { exterior_walls(); }   // Turn on or off here (all exterior walls)
+  %exterior_walls();   // Turn on or off here (all exterior walls)
+  rotate([0, 0, 270]) {deck();}
+  translate([0, 0, -ground_drop]) {
+    *tree();                                   // Turn on or off here (the tree)
+    ground();
+    water();
+    seawall();
+  }
 }
 
 module exterior_walls() {
@@ -646,8 +653,8 @@ window01_dimensions       = [down_south_window_width, down_south_window_height];
 window02_location         = [(house_width - down_south_window_width - inches(12)), 0, window_height_from_floor];
 window02_dimensions       = [down_south_window_width, down_south_window_height];
 
-// upstairs, south facing windows
-up_south_width            = feet(12);
+// upstairs, south facing window
+up_south_width            = feet(10);
 up_south_height           = feet(6);
 
 // window03
@@ -807,6 +814,78 @@ module sheds_area() {
     }
   }
 }
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > Deck
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > Deck
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+deck_width           = house_width - feet(2);
+deck_length            = feet(16);
+deck_dimensions       = [deck_length, deck_width, inches(1)];
+deck_location         = [0, house_width/2 - deck_width/2, 0];
+deck_tread_width      = deck_width/2;
+deck_tread_depth      = inches(10);
+deck_tread_height     = inches(8);
+deck_num_treads       = 2;
+deck_stairs_location  = [deck_length, deck_width, 0];
+lower_deck_width      = deck_tread_width;
+lower_deck_length     = deck_tread_width;
+lower_deck_dimensions = [lower_deck_length, lower_deck_width, inches(1)];
+lower_deck_location   = [(deck_tread_depth * deck_num_treads), -deck_tread_width, -(deck_tread_height * deck_num_treads)];
+
+ground_drop           = (deck_tread_height * deck_num_treads) + inches(2);
+//###########################################################
+//###########################################################
+
+module deck() {
+  translate(deck_location) {
+    color("brown") {cube(deck_dimensions);
+      deck_stairs();
+    }
+  }
+}
+
+module deck_stairs() {
+  translate(deck_stairs_location) {
+    for ( i = [1 : deck_num_treads] ) {
+      translate([(deck_tread_depth * (i - 1)), -deck_tread_width, -(deck_tread_height * i)]) {
+        cube([deck_tread_depth, deck_tread_width, deck_tread_height]);
+      }
+    }
+    lower_deck();
+  }
+}
+
+module lower_deck() {
+  translate(lower_deck_location) {
+    cube(lower_deck_dimensions);
+  }
+}
+
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 //
@@ -835,17 +914,137 @@ module sheds_area() {
 /////////////////////////////////
 // Derived / Estimated Dimensions
 // Use these until you get something better, then replace and delete them.
-
+tree_location       = [house_width + feet(4), -feet(6), 0];
 
 //###########################################################
 //###########################################################
 
 module tree() {
-  translate([house_width, -feet(8), 0]) {
+  translate(tree_location) {
     color("brown") {cylinder(h = feet(24), r1 = inches(20), r2 = inches(10), center = false);}
     translate([0, 0, feet(34)]) {
       color("green") {sphere(r = feet(10));}
     }
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > Ground
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > Ground
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+stage_width           = feet(75);
+stage_length          = feet(125);
+house_to_water        = feet(40);
+center_house_on_stage = stage_width/2 - house_width/2 - addition_width/2;
+
+//###########################################################
+//###########################################################
+
+module ground() {
+  translate([-center_house_on_stage, -house_to_water, -inches(1)]) {
+    color("green") {cube([stage_width, stage_length, inches(1)]);}
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > Water
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > Water
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+water_length      = feet(100);
+
+//###########################################################
+//###########################################################
+
+module water() {
+  translate([-center_house_on_stage, -water_length - house_to_water, -inches(61)]) {
+    color("blue") {cube([stage_width, water_length, inches(1)]);}
+  }
+}
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+// Exterior > Sea Wall
+//
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+//###########################################################
+//###########################################################
+//  Dimensions
+//  Exterior > Sea Wall
+//
+//###########################################################
+//###########################################################
+///////////////////
+// Measured dimensions
+// Put measured dimensions up top here to make them easy to find. 
+// Name them well, and then replace the arbitrary or caclculated
+// dimension below. The model is measured from the SW corner of the house.
+// That is the left corner if you are between the house and the water looking 
+// at the house.
+// dimension_name            = inches(3);
+// other_dimension_name      = feet(7) + inches(2);
+
+/////////////////////////////////
+// Derived / Estimated Dimensions
+// Use these until you get something better, then replace and delete them.
+
+
+//###########################################################
+//###########################################################
+
+module seawall() {
+  translate([-center_house_on_stage, -(house_to_water + feet(2)), -inches(61)]) {
+    color("brown") {cube([stage_width, feet(2), inches(62)]);}
   }
 }
 
@@ -897,10 +1096,10 @@ west_wall_to_fireplace    = (house_width/2 - fireplace01_width/2) - feet(1.5);
 module interior() {
   // % floor02();                                               // Turn on or off here (floor)
   color("grey") { floor02(); }
-  color("AntiqueWhite") {
+  // color("AntiqueWhite") {
     stairs01();                                             // Turn on or off here (stairs)
     second_floor();                                         // Turn on or off here (second floor)
-  }
+  // }
   first_floor();                                            // Turn on or off here (first floor)
   color("IndianRed") {fireplace(); }                        // Turn on or off here (fireplace)
 }
@@ -1175,7 +1374,7 @@ module second_floor() {
  north_br_shared_wall();
  *master_closet();
  master_bath();
- hallway();
+ *hallway();
  master_bedroom();
 }
 
@@ -1342,8 +1541,22 @@ tub_length                                = feet(6);
 // int_door02
 // master_bath__BR_door_dimensions
 int_door03_loc                            = [(master_bath_south_wall_width - (master_closet_south_wall_width + inches(6)) - int_door_width), 0, 0];
-
+// north_br_south_wall_location              = house_length - north_br_shared_wall_width - int_wall_thickness;
 east_wall_to_bath_west_wall               = feet(10); // measure this.
+
+master_bath_jog2_wall_width                = feet(4);
+south_wall_to_jog2                          = north_br_south_wall_location - master_bath_jog2_wall_width;
+master_bath_jog2_wall_dimensions           = [master_bath_jog2_wall_width, int_wall_thickness, story_height];
+master_bath_jog2_wall_location             = [south_wall_to_jog2, -(house_width - tub_length - int_wall_thickness), story_height];
+
+// int_door04
+// bathroom door in hallway
+int_door04_loc                        = [(south_hall_wall_width - int_door_width - inches(6)), 0, 0];
+
+// west wall of bathroom AKA end of hallway wall
+bath_west_wall_width                      = (north_br_south_wall_location - south_wall_to_bath_south_wall - hall_width);
+bath_west_wall_dimensions                 = [bath_west_wall_width, int_wall_thickness, story_height];
+bath_west_wall_location                   = [south_wall_to_bath_south_wall, -(house_width - east_wall_to_bath_west_wall), story_height];
 
 
 //###########################################################
@@ -1365,7 +1578,29 @@ module master_bath() {
      cube(bath_west_wall_dimensions);
     }
   }
+  master_bath_jog1_wall();
+  #master_bath_jog2_wall();
 }
+
+module master_bath_jog1_wall() {
+  rotate([0, 0, 0]) {
+    translate(south_hall_wall_location) {
+      difference() {
+        cube(south_hall_wall_dimensions);
+        int_pierceing(int_door_dimensions, int_door04_loc);
+      }
+    }
+  }
+}
+
+module master_bath_jog2_wall() {
+  rotate([0, 0, 90]) {
+    translate(master_bath_jog2_wall_location) {
+      cube(master_bath_jog2_wall_dimensions);
+    }
+  }
+}
+
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
@@ -1433,7 +1668,6 @@ module north_br_shared_wall() {
     }
   }
 }
-
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
