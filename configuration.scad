@@ -3,7 +3,6 @@ $fn = 100;
 /////////////
 // dimensions
 // in inches. Use feet(x) and inches(y) when specifying dimensions.
-
 house_length      = feet(45); // North - South
 house_width       = feet(22); // East - West
 house_height      = feet(22);
@@ -12,9 +11,22 @@ house_height      = feet(22);
 ext_wall_thickness  = inches(8);
 int_wall_thickness  = inches(4);
 
-// Floor / Story related functions
+// Floor / Story related dimensions
 story_height       = feet(11);
 floor_thickness     = inches(10);
+
+// door and window dimensions
+/////////////////////////////
+window_height_from_floor  = feet(2);
+
+// 3.0 Interior door
+int_door_width            = feet(3);
+int_door_height           = feet(7);
+
+// Sliding glass door
+sliding_door_width      = feet(6);
+sliding_door_height     = feet(8);
+
 
 // Bay window area simulation
 bay_window_width      = feet(8);
@@ -33,5 +45,5 @@ pantry_depth          = feet(8);
 
 
 
-function feet(feet)       = feet * 12;
+function feet(feet)         = inches(feet * 12);
 function inches(inch)       = inch;
